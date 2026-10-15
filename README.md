@@ -3,6 +3,12 @@
 Companion repository of the manuscript *Learning the Ductile-to-Brittle Transition Curve of Steels: Direct Machine Learning versus
 Empirical-Equation-Constrained Models with Validation on In-House Cast Steels* (submitted to *Metals*, MDPI).
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23384571.svg)](https://doi.org/10.5281/zenodo.23384571)
+
+## Citation
+Seo, N. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.0.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
+(see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23384572).
+
 ## Contents
 - `data/charpy_literature_database.csv` – 639 literature Charpy records (cp949 encoding). Column `No` is the record number used in
   `data/TableS1_sources.csv` (row ranges per source publication). `analysis/common.py` removes the 5 duplicated records of one source and the
@@ -32,4 +38,5 @@ python analysis/10_eda.py
 
 ## Licence
 Code: MIT (see `LICENSE`). Data: CC BY 4.0 (see `data/LICENSE-DATA.md`).
+
 

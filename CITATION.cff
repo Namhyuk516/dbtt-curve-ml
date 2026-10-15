@@ -5,7 +5,20 @@ type: software
 authors:
   - family-names: Seo
     given-names: Namhyuk
-    email: seonh9405@gmail.com
+    email: seonh0516@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+  - family-names: Park
+    given-names: Ji-Woo
+    email: pjwoo@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+  - family-names: Lee
+    given-names: Seok-Jae
+    email: seokjaelee@jbnu.ac.kr
+    affiliation: "Division of Advanced Materials Engineering and Research Center for Advanced Materials Development, Jeonbuk National University, Jeonju, Republic of Korea"
+  - family-names: Kim
+    given-names: Min-Su
+    email: mskim85@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
 version: v1.0.0
 date-released: 2026-10-15
 doi: 10.5281/zenodo.23384571

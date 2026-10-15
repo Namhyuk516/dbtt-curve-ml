@@ -1,0 +1,125 @@
+=== 1. steel classes ===
+                             points  conditions  alloys  Impact_med  Impact_max   Tmin   Tmax
+cls                                                                                         
+9-12Cr (heat-resistant)         77          14      10        78.8       345.4 -196.8  198.8
+High-C (spring/medium-C)        43          13       3        10.8        40.6  -40.0   80.0
+Low-alloy (2.5-7)              271          94      28        71.5       331.0 -196.7  287.9
+Medium-Mn                       52          11       5        56.3       258.3 -200.0   25.0
+Plain C / HSLA (alloy<2.5)     173          42      15        49.2       361.0 -196.6  200.0 
+
+=== 3. strongly correlated feature pairs (|Spearman| >= 0.5, per condition) ===
+  T_temp               HJ_temper            rho=+0.99
+  P                    S                    rho=+0.71
+  Ni                   Cu                   rho=+0.67
+  C                    Ms_Andrews           rho=-0.63
+  CE_IIW               Ms_Andrews           rho=-0.62
+  Mn                   Cr                   rho=-0.58
+
+=== 3b. Spearman correlation of features with Impact (all 616 points) and within test-temperature bands ===
+                     all  T<=-60  -60<T<=0  0<T<=40  T>40
+feature                                                  
+C                  -0.29   -0.11     -0.37    -0.58 -0.61
+S                  -0.18   -0.18     -0.08    -0.25 -0.51
+B                  -0.13   -0.22     -0.14    -0.04 -0.09
+P                  -0.10   -0.12     -0.03    -0.17 -0.22
+V                  -0.08   -0.18     -0.17     0.01  0.04
+Rolled_Forged_Cast -0.07    0.08     -0.06     0.19 -0.34
+CE_IIW             -0.02    0.05     -0.11     0.02  0.21
+Cr                  0.01    0.04     -0.07    -0.02  0.32
+Ni                  0.03    0.13     -0.05     0.10  0.07
+Cu                  0.05    0.22      0.08    -0.01 -0.08
+Mn                  0.05    0.13      0.05     0.12 -0.13
+Si                  0.06    0.09     -0.02     0.01  0.30
+Ti                  0.06    0.23      0.14    -0.12 -0.13
+Q_type              0.06   -0.05      0.38    -0.07 -0.18
+T_time              0.07   -0.09     -0.09     0.20  0.39
+W                   0.09   -0.16      0.12     0.36  0.30
+T_type              0.09    0.28      0.15    -0.01  0.06
+Mo                  0.11    0.15     -0.07     0.19  0.39
+Al                  0.14    0.21      0.22     0.21  0.25
+Q_temp              0.14   -0.24      0.12     0.41  0.56
+Nb                  0.16    0.34      0.26     0.14 -0.02
+Q_time              0.18    0.03      0.10     0.27  0.55
+N                   0.26    0.15      0.28     0.46  0.50
+Ms_Andrews          0.26    0.02      0.31     0.45  0.25
+HJ_temper           0.27   -0.10      0.29     0.56  0.67
+T_temp              0.28   -0.10      0.31     0.57  0.67
+test_temp           0.34    0.54      0.06    -0.23  0.38 
+
+=== 4. curve parameters (n=62 fitted curves, R2>0.8) ===
+        LSE    USE     T0     Cw
+count  62.0   62.0   62.0   62.0
+mean    7.9  137.7  -26.6   54.1
+std     9.8   99.4   50.8   49.4
+min     0.0    5.4 -164.6    3.0
+25%     0.0   54.1  -48.6   29.2
+50%     4.6  113.4  -25.1   46.4
+75%    10.1  203.2    7.8   65.0
+max    51.8  397.6   80.1  300.0 
+
+Correlation among curve parameters (Spearman):
+       LSE   USE    T0    Cw
+LSE  1.00 -0.08  0.25 -0.39
+USE -0.08  1.00 -0.44  0.04
+T0   0.25 -0.44  1.00 -0.13
+Cw  -0.39  0.04 -0.13  1.00 
+
+Spearman rho of features vs curve parameters (* p<0.05, ** p<0.01):
+  T_type             T0=-0.47**  USE=+0.08    Cw=+0.24    LSE=-0.17  
+  N                  T0=-0.36**  USE=+0.37**  Cw=+0.07    LSE=-0.09  
+  Nb                 T0=-0.36**  USE=+0.14    Cw=+0.13    LSE=-0.23  
+  Al                 T0=-0.31*  USE=+0.23    Cw=+0.29*  LSE=-0.18  
+  Ms_Andrews         T0=-0.29*  USE=+0.46**  Cw=-0.14    LSE=+0.11  
+  Si                 T0=-0.22    USE=+0.06    Cw=+0.07    LSE=+0.08  
+  T_temp             T0=-0.20    USE=+0.60**  Cw=-0.22    LSE=+0.10  
+  Mn                 T0=-0.19    USE=-0.10    Cw=+0.27*  LSE=-0.06  
+  HJ_temper          T0=-0.16    USE=+0.60**  Cw=-0.22    LSE=+0.11  
+  Q_type             T0=-0.15    USE=+0.17    Cw=+0.10    LSE=-0.05  
+  Q_temp             T0=-0.14    USE=+0.39**  Cw=-0.12    LSE=+0.13  
+  W                  T0=-0.13    USE=+0.33**  Cw=-0.19    LSE=-0.15  
+  Rolled_Forged_Cast T0=-0.10    USE=-0.29*  Cw=+0.28*  LSE=-0.02  
+  P                  T0=-0.05    USE=-0.14    Cw=+0.05    LSE=+0.10  
+  S                  T0=+0.00    USE=-0.26*  Cw=+0.05    LSE=+0.04  
+  Cr                 T0=+0.02    USE=-0.06    Cw=-0.18    LSE=-0.11  
+  Ti                 T0=+0.02    USE=+0.02    Cw=-0.23    LSE=+0.09  
+  B                  T0=+0.05    USE=-0.06    Cw=-0.16    LSE=+0.18  
+  CE_IIW             T0=+0.10    USE=-0.00    Cw=-0.03    LSE=-0.08  
+  V                  T0=+0.15    USE=-0.13    Cw=-0.22    LSE=+0.14  
+  Mo                 T0=+0.21    USE=+0.09    Cw=-0.08    LSE=+0.30*
+  Ni                 T0=+0.21    USE=-0.07    Cw=-0.03    LSE=+0.31*
+  Q_time             T0=+0.24    USE=+0.40**  Cw=-0.17    LSE=+0.32*
+  Pcm                T0=+0.25    USE=-0.31*  Cw=+0.06    LSE=-0.12  
+  C                  T0=+0.30*  USE=-0.55**  Cw=+0.12    LSE=-0.02  
+  Cu                 T0=+0.31*  USE=-0.22    Cw=-0.09    LSE=+0.16  
+  T_time             T0=+0.36**  USE=+0.16    Cw=-0.01    LSE=+0.11  
+
+=== 5. within-alloy tempering effect (alloys with >=3 tempering conditions; Spearman of T_temp vs mean Impact at the common test temperature) ===
+                    Alloy  test_T  n_temper   rho    p Impact_range
+    0.25C_low_alloy_steel    25.0         5  0.70 0.19       61-117
+                    35MnB   -40.0         7  1.00 0.00        20-86
+                42CrMo4-V   -30.0         6  1.00 0.00       22-132
+                51CrV4_v1   -40.0         5  0.70 0.19         3-15
+                51CrV4_v2    25.0         3  1.00 0.00         2-14
+                    55Cr3   -40.0         5  0.70 0.19         4-20
+                 AISI4140    25.0         6  0.94 0.00        9-108
+               HSLA_steel   -20.0         5  0.00 1.00         4-40
+               HSLC_steel   -80.0         3 -0.50 0.67       66-167
+              LC-LA_Steel   -40.0         5  0.40 0.50      284-331
+       Low_alloy_HS_steel    25.0         6  0.90 0.01        12-33
+         MMn_Duplex_steel   -80.0         3  1.00 0.00       15-155
+           Medium_C_Steel    25.0         4  1.00 0.00          1-3
+              Nb-Ti-Steel   -20.0         6  0.20 0.70      290-361
+Nitride_martensitic_steel    20.0         3  1.00 0.00        19-97
+       QT_medium-MN_steel    25.0         4  0.40 0.60       22-257
+                 QT_steel  -100.0         3 -1.00 0.00        20-43
+      Ti-containing_steel   -40.0         6  0.03 0.96       62-209
+            Ti-free_steel   -40.0         6  0.37 0.47       56-166 
+
+=== 6. nearest literature alloys (standardised log-composition distance) to each cast alloy ===
+  MSN: 55Cr3 (C0.54 Mn0.83 Cr0.82 Ni0.09 Mo0.03, form=1.0, d=2.05); QT_steel (C0.21 Mn0.96 Cr0.18 Ni0.09 Mo0.03, form=1.0, d=2.07); LC_martensitic_steel (C0.17 Mn1.42 Cr0.35 Ni0.03 Mo0.00, form=1.0, d=2.12); Low_alloy_steel (C0.18 Mn1.40 Cr0.20 Ni0.66 Mo0.58, form=1.0, d=2.14)
+  MSNN: Low_alloy_steel (C0.18 Mn1.40 Cr0.20 Ni0.66 Mo0.58, form=1.0, d=2.06); Armor_grade_steel (C0.28 Mn1.10 Cr0.90 Ni1.70 Mo0.50, form=1.0, d=2.13); G18CrMo2-6_steel (C0.16 Mn0.75 Cr0.60 Ni0.45 Mo0.61, form=0.0, d=2.19); QT_steel (C0.21 Mn0.96 Cr0.18 Ni0.09 Mo0.03, form=1.0, d=2.20)
+  MSCM: G18CrMo2-6_steel (C0.16 Mn0.75 Cr0.60 Ni0.45 Mo0.61, form=0.0, d=1.82); Low_alloy_steel (C0.18 Mn1.40 Cr0.20 Ni0.66 Mo0.58, form=1.0, d=1.93); LC_martensitic_steel (C0.17 Mn1.42 Cr0.35 Ni0.03 Mo0.00, form=1.0, d=2.01); Medium-carbon-CrMo_steel(0B) (C0.26 Mn0.51 Cr0.87 Ni0.00 Mo0.57, form=1.0, d=2.04)
+  MSCMN: G18CrMo2-6_steel (C0.16 Mn0.75 Cr0.60 Ni0.45 Mo0.61, form=0.0, d=1.84); Low_alloy_steel (C0.18 Mn1.40 Cr0.20 Ni0.66 Mo0.58, form=1.0, d=1.88); Armor_grade_steel (C0.28 Mn1.10 Cr0.90 Ni1.70 Mo0.50, form=1.0, d=1.91); LC_martensitic_steel (C0.17 Mn1.42 Cr0.35 Ni0.03 Mo0.00, form=1.0, d=2.12)
+
+=== 7. test temperatures per condition === 1 temp: 95 conditions (97 points), 2-3: 17, >=4: 62 conditions (472 points)
+Impact replicate scatter (same cond & same test temp, n>=2): median |diff| = 3.0 J

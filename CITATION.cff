@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this data or code, please cite it as below and cite the original publications listed in data/TableS1_sources.csv for individual literature values."
+title: "dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels'"
+type: software
+authors:
+  - family-names: Seo
+    given-names: Namhyuk
+    email: seonh0516@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+  - family-names: Park
+    given-names: Ji-Woo
+    email: pjwoo@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+  - family-names: Lee
+    given-names: Seok-Jae
+    email: seokjaelee@jbnu.ac.kr
+    affiliation: "Division of Advanced Materials Engineering, Jeonbuk National University, Jeonju, Republic of Korea"
+  - family-names: Kim
+    given-names: Min-Su
+    email: mskim85@kitech.re.kr
+    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+version: v1.1.0
+date-released: 2026-10-19
+doi: 10.5281/zenodo.23384571
+repository-code: https://github.com/Namhyuk516/dbtt-curve-ml
+license: MIT
+keywords:
+  - ductile-to-brittle transition
+  - Charpy impact energy
+  - steel
+  - machine learning
+  - XGBoost
+  - physics-informed neural network

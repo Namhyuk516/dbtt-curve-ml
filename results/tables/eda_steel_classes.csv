@@ -1,0 +1,6 @@
+cls,points,conditions,alloys,Impact_med,Impact_max,Tmin,Tmax
+9-12Cr (heat-resistant),66,10,8,97.4,345.4,-196.8,198.8
+High-C (spring/medium-C),43,13,3,10.8,40.6,-40.0,80.0
+Low-alloy (2.5-7),271,94,28,71.5,331.0,-196.7,287.9
+Medium-Mn,52,11,5,56.3,258.3,-200.0,25.0
+Plain C / HSLA (alloy<2.5),172,41,14,49.1,361.0,-196.6,200.0

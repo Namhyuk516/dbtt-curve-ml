@@ -1,0 +1,2 @@
+model,h,drop,lr,wd,epochs,objective,cast_MAE,cast_R2
+tanh-NN (previous config),128,0.1349,0.00979,0.000469,1000,0.3208577101977719,56.107633688449866,0.1827987544335432

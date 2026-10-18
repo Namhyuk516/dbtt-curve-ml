@@ -1,0 +1,40 @@
+{
+  "title": "dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels'",
+  "upload_type": "software",
+  "license": "mit",
+  "creators": [
+    {
+      "name": "Seo, Namhyuk",
+      "affiliation": "Korea Institute of Industrial Technology"
+    },
+    {
+      "name": "Park, Ji-Woo",
+      "affiliation": "Korea Institute of Industrial Technology"
+    },
+    {
+      "name": "Lee, Seok-Jae",
+      "affiliation": "Jeonbuk National University"
+    },
+    {
+      "name": "Kim, Min-Su",
+      "affiliation": "Korea Institute of Industrial Technology"
+    }
+  ],
+  "description": "Compiled Charpy impact database (604 measurements, 58 steels, 40 publications), in-house cast-steel data, analysis code (direct and tanh-equation-constrained XGBoost and neural-network models) and all results of the manuscript 'Learning the Ductile-to-Brittle Transition Curve of Steels: Direct Machine Learning versus Empirical-Equation-Constrained Models with Validation on In-House Cast Steels' (submitted to Metals, MDPI).",
+  "keywords": [
+    "ductile-to-brittle transition",
+    "Charpy impact energy",
+    "steel",
+    "machine learning",
+    "XGBoost",
+    "equation-constrained learning"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/Namhyuk516/dbtt-curve-ml",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "version": "v1.1.0"
+}

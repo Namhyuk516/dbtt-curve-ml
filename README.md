@@ -10,7 +10,7 @@ Seo, N.; Park, J.-W.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'L
 (see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23460289).
 
 ## Contents
-- `data/charpy_literature_database.csv` – the 604 literature Charpy V-notch measurements used in the article (cp949 encoding; 58 steels, 169 alloy/heat-treatment conditions, 40 publications). Column `No` is the record number used in `data/TableS1_sources.csv` (row ranges per source publication). Test and heat-treatment temperatures are stored in K.
+- `data/charpy_literature_database.csv` – the 604 literature Charpy V-notch measurements used in the article (cp949 encoding; 58 steels, 169 alloy/heat-treatment conditions, 40 publications). Column `No` is the record number used in `data/TableS1_sources.csv` (row ranges per source publication). `data/TableS1_specimens.csv` lists the Charpy specimen size, notch, test standard and orientation stated in each source. Test and heat-treatment temperatures are stored in K.
 - `data/in_house_cast_steels.xlsx` – composition and Charpy energies of the four in-house cast steels (also hard-coded in `analysis/common.py`).
 - `analysis/` – all scripts (see "Reproduction"). `models.py` contains the six models, including the tanh-constrained XGBoost objective.
 - `results/tables/` – cross-validation results (`table_cv_summary.csv`, `oof_all.csv`), curve fits, SHAP importances, cast-steel validation,

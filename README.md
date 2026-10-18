@@ -6,8 +6,8 @@ Empirical-Equation-Constrained Models with Validation on In-House Cast Steels* (
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23384571.svg)](https://doi.org/10.5281/zenodo.23384571)
 
 ## Citation
-Seo, N.; Park, J.-W.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.0.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
-(see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23384572).
+Seo, N.; Park, J.-W.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.1.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
+(see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23460289).
 
 ## Contents
 - `data/charpy_literature_database.csv` – the 604 literature Charpy V-notch measurements used in the article (cp949 encoding; 58 steels, 169 alloy/heat-treatment conditions, 40 publications). Column `No` is the record number used in `data/TableS1_sources.csv` (row ranges per source publication). Test and heat-treatment temperatures are stored in K.

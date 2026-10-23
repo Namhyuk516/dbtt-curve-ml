@@ -6,7 +6,7 @@ Empirical-Equation-Constrained Models with Validation on In-House Cast Steels* (
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23384571.svg)](https://doi.org/10.5281/zenodo.23384571)
 
 ## Citation
-Seo, N.; Park, J.-W.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.1.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
+Seo, N.; Park, J.-W.; Yang, J.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.1.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
 (see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23460289).
 
 ## Contents

@@ -6,11 +6,15 @@ authors:
   - family-names: Seo
     given-names: Namhyuk
     email: seonh0516@kitech.re.kr
-    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+    affiliation: "Jeonbuk Technology Application Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
   - family-names: Park
     given-names: Ji-Woo
     email: pjwoo@kitech.re.kr
-    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+    affiliation: "Jeonbuk Technology Application Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+  - family-names: Yang
+    given-names: Junghoon
+    email: jyang@kitech.re.kr
+    affiliation: "Jeonbuk Technology Application Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
   - family-names: Lee
     given-names: Seok-Jae
     email: seokjaelee@jbnu.ac.kr
@@ -18,7 +22,7 @@ authors:
   - family-names: Kim
     given-names: Min-Su
     email: mskim85@kitech.re.kr
-    affiliation: "Jeonbuk Regional Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
+    affiliation: "Jeonbuk Technology Application Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
 version: v1.1.0
 date-released: 2026-10-19
 doi: 10.5281/zenodo.23384571

@@ -91,7 +91,7 @@ if spec_path.exists():
     para(f'**Table S1.** Sources of the literature database ({len(rows)} publications, {len(df)} Charpy measurements). "Specimen" gives the Charpy specimen size '
          'and notch as stated in the source; "standard … (dimensions not printed)" denotes sources that describe the specimens only as standard Charpy V-notch '
          'specimens, and "not stated" sources that give no information. The last column gives the number of measurements taken from each publication.')
-    table(['No.', 'Reference', 'DOI', 'Specimen', 'Measurements'], rows, [0.9, 13.4, 4.6, 5.2, 2.0], size=7.5, align_left=(1, 2, 3))
+    table(['No.', 'Reference', 'DOI', 'Specimen', 'Measurements'], rows, [0.9, 12.9, 4.6, 5.2, 2.5], size=7.5, align_left=(1, 2, 3))
 else:
     para(f'**Table S1.** Sources of the literature database ({len(rows)} publications, {len(df)} Charpy measurements). '
          'The last column gives the number of measurements taken from each publication.')

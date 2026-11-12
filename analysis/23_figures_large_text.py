@@ -1,6 +1,6 @@
 """Re-draws the manuscript figures with larger lettering.  The figure scripts are executed unchanged; matplotlib is patched so that
 every figure is drawn on a smaller canvas (same pixel width), which enlarges all text, symbols and lines relative to the panel, and a
-minimum font size is enforced so that the smallest lettering is 7 pt at the printed width of 13.9 cm (text column).  Titles that become wider
+minimum font size is enforced so that the smallest lettering is 7 pt at the printed width of 18.4 cm (full page width).  Titles that become wider
 than their panel are wrapped.  The numerical output of the scripts is unchanged.
 usage: python 23_figures_large_text.py [script names...]      (run with XGBoost 3.2.0)"""
 import sys, runpy, types, warnings, pathlib
@@ -10,11 +10,11 @@ import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt, matplotlib.figure as mfig, matplotlib.text as mtext
 from matplotlib.colors import LinearSegmentedColormap
 
-PRINT_W = 5.46            # printed figure width (in): width of the text column of the journal template
+PRINT_W = 7.26            # printed figure width (in): full width between the page margins (18.4 cm), as set in the manuscript
 MIN_PT = 7.0              # smallest lettering at the printed width (pt)
 PX_W = 2600               # pixel width of the saved figures
-SCALE = {'10_eda.py': 0.40, '01_fit_curves.py': 0.55, '06_figures.py': 0.40, '12_shap_composite.py': 0.48, '04_cast.py': 0.50,
-         '08_finetune.py': 0.60, '11_final_vs_heldout.py': 0.40}
+SCALE = {'10_eda.py': 0.50, '01_fit_curves.py': 0.60, '06_figures.py': 0.55, '12_shap_composite.py': 0.58, '04_cast.py': 0.64,
+         '08_finetune.py': 0.50, '11_final_vs_heldout.py': 0.55}
 ARGS = {'08_finetune.py': ['1']}
 K = [1.0]
 

@@ -33,12 +33,14 @@ python analysis/15_nested_cv.py XGB-direct 20   # also XGB-direct-mono, tanh-XGB
 python analysis/10_eda.py
 python analysis/16_param_accuracy.py; python analysis/17_cast_config_sensitivity.py; python analysis/18_cast_extra.py
 # analyses added in the revised manuscript (v1.2.0)
-python analysis/19_nested_cv_nn.py NN-direct 15         # also tanh-NN: nested cross-validation of the neural networks (Table S5)
+python analysis/19_nested_cv_nn.py NN-direct 15 0       # also tanh-NN and repetitions 1, 2 (15_nested_cv.py takes the repetition as third argument, too): Table S5
 python analysis/20_revision_cv.py fullsize_same_test    # Table 7; also: publication (Table S9), twostage_fair (Table S10)
 python analysis/21_param_accuracy_resolved.py           # Table S6: well-resolved vs poorly resolved reference curves
 python analysis/22_cast_revision.py                     # Table 9, Tables S11 and S12
 python analysis/23_figures_large_text.py                # re-draws the figures of the article with larger lettering
 python analysis/24_corr_robustness.py                   # Table S13: robustness of the rank correlations
+python analysis/25_missing_as_nan.py                    # Table S14: unreported elements coded as missing values
+python analysis/26_cast_tt_uncertainty.py               # Table S15: curve parameters of the cast steels from eight specimens
 ```
 `analysis/run_pipeline.ps1` runs everything after tuning in four parallel chains (Windows PowerShell; edit the Python path at the top).
 

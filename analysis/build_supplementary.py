@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Build the Supplementary Materials (Tables S1-S13) from the result files in ../results.
+"""Build the Supplementary Materials (Tables S1-S15) from the result files in ../results.
 Tables and table parts that are new in the revised version are highlighted (HL = True)."""
 import sys
 from pathlib import Path
@@ -153,24 +153,26 @@ para(f'**Table S4.** Cross-validation results after removing the {n1} conditions
 table(['Model', 'Data'] + HDR, rows, [2.6, 5.6, 2.3, 2.7, 2.7, 3.1, 2.5, 3.0])
 d.add_page_break()
 
-# ------------------------------------------------------------------ Table S5: nested cross-validation (all tuned models)
-cv0 = pd.read_csv(RES / 'cv_all.csv'); cv0 = cv0[cv0.rep == 0].set_index(['model', 'scenario'])
-nc = pd.concat([pd.read_csv(f) for f in RES.glob('nested_cv_*.csv') if 'selected' not in f.name]).set_index(['model', 'scenario'])
+# ------------------------------------------------------------------ Table S5: nested cross-validation (all tuned models, three repetitions)
+cva = pd.read_csv(RES / 'cv_all.csv').set_index(['model', 'scenario', 'rep'])
+nc = pd.concat([pd.read_csv(f) for f in RES.glob('nested_cv_*.csv') if 'selected' not in f.name]); nc['rep'] = nc['rep'].fillna(0).astype(int)
+nc = nc.set_index(['model', 'scenario', 'rep']).sort_index()
+pm = lambda v: f'{np.mean(v):.2f} ± {np.std(v, ddof=1):.2f}'.replace('-', '−')
 rows = []
 for model in ['XGB-direct', 'XGB-direct-mono', 'tanh-XGB', 'NN-direct', 'tanh-NN']:
     r = [model]
     for s_ in ['unseen-condition', 'unseen-alloy']:
-        r += [f3(cv0.loc[(model, s_), 'R2']), f1(cv0.loc[(model, s_), 'MAE']), f3(nc.loc[(model, s_), 'R2']), f1(nc.loc[(model, s_), 'MAE']), f3(nc.loc[(model, s_), 'R2'] - cv0.loc[(model, s_), 'R2'])]
+        g_ = [cva.loc[(model, s_, k), 'R2'] for k in range(3)]; n_ = [nc.loc[(model, s_, k), 'R2'] for k in range(3)]
+        r += [pm(g_), pm(n_), pm(np.array(n_) - np.array(g_)), f1(np.mean([cva.loc[(model, s_, k), 'MAE'] for k in range(3)])), f1(nc.loc[(model, s_), 'MAE'].mean())]
     rows.append(r)
 para('**Table S5.** Nested cross-validation of the five tuned models. In the nested procedure the hyper-parameters are re-selected inside every outer fold, so that no '
      'information from the held-out fold enters the selection (tree models: Optuna, 20 trials on an inner five-fold grouped split of the training folds; neural networks: '
      '15 trials on an inner three-fold grouped split with ensembles of three networks, the selected configuration being refitted as an ensemble of five). Outer: five-fold '
-     'grouped split, one repetition. "Global" denotes the hyper-parameters selected once on the whole database (Section 2.4), evaluated on the same fold assignment as the '
-     'nested procedure (repetition 1 of Table 6; the three-repetition means of Table 6 are lower, e.g., 0.29–0.32 for the tree models under unseen-steel splitting). '
-     'ΔR² = nested − global; negative values indicate an optimistic bias of the globally tuned estimate.', new=True)
-table(['Model', 'Unseen cond. R² (global)', 'Unseen cond. MAE (global)', 'Unseen cond. R² (nested)', 'Unseen cond. MAE (nested)', 'Unseen cond. ΔR²',
-       'Unseen steel R² (global)', 'Unseen steel MAE (global)', 'Unseen steel R² (nested)', 'Unseen steel MAE (nested)', 'Unseen steel ΔR²'], rows,
-      [2.6, 2.3, 2.3, 2.3, 2.3, 2.0, 2.3, 2.3, 2.3, 2.3, 2.0], new=True)
+     'grouped split on the three fold assignments of Table 6. "Global" denotes the hyper-parameters selected once on the whole database (Section 2.4), i.e., the values of Table 6. '
+     'Mean ± standard deviation over the three repetitions; ΔR² = nested − global, computed for each repetition; negative values indicate an optimistic bias of the globally tuned estimate.', new=True)
+table(['Model', 'Unseen cond. R² (global)', 'Unseen cond. R² (nested)', 'Unseen cond. ΔR²', 'Unseen cond. MAE (global)', 'Unseen cond. MAE (nested)',
+       'Unseen steel R² (global)', 'Unseen steel R² (nested)', 'Unseen steel ΔR²', 'Unseen steel MAE (global)', 'Unseen steel MAE (nested)'], rows,
+      [2.5, 2.4, 2.4, 2.5, 2.1, 2.1, 2.4, 2.4, 2.5, 2.1, 2.1], new=True)
 
 # ------------------------------------------------------------------ Table S6: parameter-level accuracy of the equation-based models
 pr = pd.read_csv(RES / 'supp_param_accuracy_percond.csv'); fu = pd.read_csv(RES / 'curve_fit_uncertainty_resolved.csv')
@@ -296,8 +298,8 @@ para('**Table S12.** Leave-one-cast-steel-out errors (MAE, J) on the held-out ca
 table(['Method'] + AL + ['Mean MAE (J)', 'Mean R²'], rows, [10.5, 2.0, 2.0, 2.0, 2.0, 2.6, 2.2], new=True)
 lm = ls.groupby(['model', 'lam']).MAE.mean().unstack()
 rows = [[m_] + [f1(lm.loc[m_, l_]) for l_ in [1.0, 5.0, 20.0]] for m_ in ['tanh-NN', 'NN-direct', 'tanh-XGB', 'XGB-direct', 'XGB-direct-mono']]
-para('Sensitivity of the fine-tuned models to the weight λ of the cast data (mean MAE over the four held-out steels, J). λ = 5 is the value used in Table 8; it was fixed before the '
-     'leave-one-out evaluation and not optimised on the held-out steels. This is a separate run, so that the tree-model values at λ = 5 differ from Table 8 by up to 0.7 J because of the '
+para('Sensitivity of the fine-tuned models to the weight λ of the cast data (mean MAE over the four held-out steels, J). λ = 5 is the value used in Table 8; it was set once as a default value and '
+     'was not selected by comparing errors on the held-out steels. This is a separate run, so that the tree-model values at λ = 5 differ from Table 8 by up to 0.7 J because of the '
      'random row and column subsampling of the boosting rounds.', new=True)
 table(['Model', 'λ = 1', 'λ = 5', 'λ = 20'], rows, [4.0, 2.4, 2.4, 2.4], new=True)
 
@@ -313,8 +315,32 @@ rows = [[NM.get(r.descriptor, r.descriptor), f'{int(r.n_nonzero)} / {int(r.n_non
          _rho(r, 'USE_all'), _rho(r, 'USE_resolved'), _rho(r, 'USE_reported')] for _, r in cr.iterrows()]
 para(f'**Table S13.** Robustness of the Spearman rank correlations between descriptors and fitted curve parameters (Table 5 of the article): all {len(fu)} complete curves, the {nres} well-resolved curves only '
      '(classification of Table S6), and, for elements that many sources do not report and that are then entered as zero, the curves with a reported (non-zero) value only. '
-     'The second column gives the number of curves with a non-zero value of the descriptor among all and among the well-resolved curves. ** p < 0.01, * p < 0.05.', new=True)
+     'The second column gives the number of curves with a non-zero value of the descriptor among all and among the well-resolved curves. Two asterisks: p < 0.01; one asterisk: p < 0.05.', new=True)
 table(['Descriptor', 'Non-zero (all / well resolved)', 'Tt, all curves', 'Tt, well resolved', 'Tt, reported values only', 'USE, all curves', 'USE, well resolved', 'USE, reported values only'],
       rows, [5.0, 3.6, 2.6, 2.6, 3.0, 2.6, 2.6, 3.0], new=True)
+
+# ------------------------------------------------------------------ Table S14: unreported elements as missing values
+mcv = pd.read_csv(RES / 'supp_missing_coding_cv.csv').groupby(['model', 'coding', 'scenario'])[['R2', 'MAE']].mean(); mca = pd.read_csv(RES / 'supp_missing_coding_cast.csv').set_index(['model', 'coding'])
+rows = []
+for m_ in MODELS6:
+    for cod, lab in [('zero', 'zero (main analysis)'), ('missing', 'missing value')]:
+        r = [disp(m_), lab]
+        for s_ in SC: r += [f3(mcv.loc[(m_, cod, s_), 'R2']), f1(mcv.loc[(m_, cod, s_), 'MAE'])]
+        rows.append(r + [f1(mca.loc[(m_, cod), 'cast_MAE']), f3(mca.loc[(m_, cod), 'cast_R2'])])
+para('**Table S14.** Sensitivity to the coding of unreported elements. In the main analysis an element that a source does not report is entered as zero. In the alternative coding an element is '
+     'treated as a missing value for all steels of a publication in which it is zero throughout, and as a true zero otherwise; for the cast steels the eleven elements that were not analysed are missing. '
+     'The tree-based models receive the missing values directly (XGBoost assigns them to a branch at every split); the neural networks receive the mean of the reported values together with one indicator '
+     'input per element. The physics-derived descriptors and the hyper-parameters are those of the main analysis (not re-tuned). Cross-validation: five folds, mean of three repetitions; '
+     'external test: 32 measurements of the four cast steels.', new=True)
+table(['Model', 'Unreported elements'] + HDR + ['Cast MAE (J)', 'Cast R²'], rows, [2.6, 3.6, 2.0, 2.3, 2.3, 2.6, 2.2, 2.6, 2.3, 1.9], new=True)
+
+# ------------------------------------------------------------------ Table S15: curve parameters of the cast steels from eight specimens
+tu = pd.read_csv(RES / 'cast_tt_uncertainty.csv')
+rows = [[r.Alloy, f1(r.Tt), f1(r.se_Tt), f'{f1(r.Tt_lo)} to {f1(r.Tt_hi)}', f'{r.USE:.0f}', f'{r.se_USE:.0f}', f'{r.USE_lo:.0f} to {r.USE_hi:.0f}', f'{r.E25_mean:.0f}'] for _, r in tu.iterrows()]
+para('**Table S15.** Curve parameters obtained when Equation (1) is fitted to the eight measurements of each cast steel (two specimens at each of 25, 0, −20 and −40 °C; bounds of Section 2.2), with the '
+     'standard errors of the least-squares fit and 95% intervals from a bootstrap in which the two energies measured at each temperature are resampled with replacement (2000 replicates). '
+     'The last column is the mean energy measured at 25 °C, the highest test temperature. The mid-transition temperature is located to within about ±5 to ±12 °C, but the upper-shelf energy is an '
+     'extrapolation; with two specimens per temperature the bootstrap understates the true scatter. These values are not used as reference values in the article.', new=True)
+table(['Steel', 'Tt (°C)', 'SE of Tt (°C)', '95% interval of Tt (°C)', 'USE (J)', 'SE of USE (J)', '95% interval of USE (J)', 'Mean energy at 25 °C (J)'], rows, [2.2, 2.0, 2.4, 3.8, 2.0, 2.4, 3.8, 3.8], new=True)
 
 out = ROOT / ('Supplementary_Materials_ver5_revised.docx' if HL else 'Supplementary_Materials_ver5_clean.docx'); d.save(out); print('written', out)

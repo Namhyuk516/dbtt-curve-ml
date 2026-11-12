@@ -1,6 +1,6 @@
 """Re-draws the manuscript figures with larger lettering.  The figure scripts are executed unchanged; matplotlib is patched so that
 every figure is drawn on a smaller canvas (same pixel width), which enlarges all text, symbols and lines relative to the panel, and a
-minimum font size is enforced so that the smallest lettering is about 7.5 pt at the printed width of 18.4 cm.  Titles that become wider
+minimum font size is enforced so that the smallest lettering is 7 pt at the printed width of 13.9 cm (text column).  Titles that become wider
 than their panel are wrapped.  The numerical output of the scripts is unchanged.
 usage: python 23_figures_large_text.py [script names...]      (run with XGBoost 3.2.0)"""
 import sys, runpy, types, warnings, pathlib
@@ -10,11 +10,11 @@ import numpy as np, matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt, matplotlib.figure as mfig, matplotlib.text as mtext
 from matplotlib.colors import LinearSegmentedColormap
 
-PRINT_W = 7.26            # printed figure width (in)
-MIN_PT = 7.5              # smallest lettering at the printed width (pt)
+PRINT_W = 5.46            # printed figure width (in): width of the text column of the journal template
+MIN_PT = 7.0              # smallest lettering at the printed width (pt)
 PX_W = 2600               # pixel width of the saved figures
-SCALE = {'10_eda.py': 0.50, '01_fit_curves.py': 0.62, '06_figures.py': 0.56, '12_shap_composite.py': 0.60, '04_cast.py': 0.66,
-         '08_finetune.py': 0.52, '11_final_vs_heldout.py': 0.56}
+SCALE = {'10_eda.py': 0.40, '01_fit_curves.py': 0.55, '06_figures.py': 0.40, '12_shap_composite.py': 0.48, '04_cast.py': 0.50,
+         '08_finetune.py': 0.60, '11_final_vs_heldout.py': 0.40}
 ARGS = {'08_finetune.py': ['1']}
 K = [1.0]
 
@@ -29,13 +29,19 @@ def savefig(self, fname, *a, **kw):
     for ax in self.axes:                                   # tick labels are created lazily
         ax.tick_params(labelsize=max(fmin, min(l.get_fontsize() for l in ax.get_xticklabels() + ax.get_yticklabels()) if ax.get_xticklabels() else fmin))
     self.canvas.draw(); r = self.canvas.get_renderer()
-    for ax in self.axes:                                   # wrap titles wider than the panel
+    for ax in self.axes:                                   # wrap titles wider than the panel (at most two extra line breaks)
         for t in (ax.title, ax._left_title):
-            s = t.get_text()
-            if s and '\n' not in s.replace('\n(band', '') and t.get_window_extent(r).width > 1.02 * ax.get_window_extent(r).width:
-                for sep in ('  (', ' (', ': ', ' | '):
-                    if sep in s: t.set_text(s.replace(sep, '\n' + sep.strip() + ('' if sep.strip() == '(' else ' '), 1).replace('\n: ', ':\n').replace('\n| ', '\n')); break
-    try: self.tight_layout(rect=getattr(self, '_tl_rect', None))
+            for sep, rep in (('  (', '\n('), (' (', '\n('), (': ', ':\n'), (' | ', '\n'), (', ', ',\n'), (' [', '\n[')):
+                s_ = t.get_text()
+                if not s_ or max(t.get_window_extent(r).width, 0) <= 1.3 * ax.get_window_extent(r).width: break
+                if sep in s_.split('\n')[0] or sep in s_.split('\n')[-1]:
+                    k = s_.rfind(sep) if sep == ' [' else s_.find(sep)
+                    t.set_text(s_[:k] + rep + s_[k + len(sep):]); self.canvas.draw()
+    rect = getattr(self, '_tl_rect', None)
+    if self.legends:                                       # figure legend below the panels: reserve exactly its height
+        for t in self.legends[0].get_texts(): t.set_fontsize(max(fmin, t.get_fontsize()))
+        self.canvas.draw(); rect = (0, self.legends[0].get_window_extent(self.canvas.get_renderer()).height / (self.get_figheight() * self.dpi) + 0.012, 1, 1)
+    try: self.tight_layout(rect=rect)
     except Exception: pass
     kw['dpi'] = PX_W / w
     return _savefig(self, fname, *a, **kw)
@@ -91,6 +97,7 @@ except Exception:
 
 for name in (sys.argv[1:] or list(SCALE)):
     K[0] = SCALE[name]; print('=====', name, 'canvas scale', K[0], flush=True)
+    matplotlib.rcParams.update(matplotlib.rcParamsDefault); matplotlib.use('Agg')        # a script may change rcParams
     argv = sys.argv; sys.argv = [str(HERE / name)] + ARGS.get(name, [])
     try: runpy.run_path(str(HERE / name), run_name='__main__')
     finally: sys.argv = argv; plt.close('all')

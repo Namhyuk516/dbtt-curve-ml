@@ -24,7 +24,7 @@ def rows_for(alloy_row, T):
 
 
 # ---------- 1. curves with the assumed heat treatment ----------
-fig, axs = plt.subplots(2, 2, figsize=(12, 9)); axs = axs.ravel(); recs = []
+fig, axs = plt.subplots(2, 2, figsize=(12, 9.6)); axs = axs.ravel(); recs = []
 for ax, (_, a) in zip(axs, cast.iterrows()):
     meas = CAST_MEAS[CAST_MEAS.Alloy == a.Alloy]
     for name, m in fitted.items():
@@ -39,9 +39,9 @@ for ax, (_, a) in zip(axs, cast.iterrows()):
     ax.plot(ex.test_temp, ex.Impact, 'ko', ms=6, label='measured')
     if len(ap): ax.plot(ap.test_temp, ap.Impact, 'o', mfc='none', mec='k', ms=6, label='measured (digitised, approx.)')
     ax.set_title(f'{a.Alloy}: {a.C:.2f}C–{a.Mn:.2f}Mn–{a.Si:.2f}Si' + (f'–{a.Cr:.2f}Cr' if a.Cr else '') + (f'–{a.Mo:.2f}Mo' if a.Mo else '') + (f'–{a.Ni:.2f}Ni' if a.Ni else '')
-, fontsize=9)
-    ax.set_xlabel('Test temperature (°C)'); ax.set_ylabel('Charpy impact energy (J)'); ax.set_ylim(0, None); ax.grid(alpha=.3)
-h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=7, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.04, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_cast_validation.png', dpi=150)
+, fontsize=7)
+    ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, None); ax.grid(alpha=.3)
+h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=4, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.04, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_cast_validation.png', dpi=150)
 rec = pd.DataFrame(recs); rec.to_csv(RES / 'cast_validation.csv', index=False)
 print(rec.round(2).to_string())
 print('\nmean over 4 alloys:\n', rec.groupby('model')[['R2', 'MAE', 'RMSE']].mean().round(2))

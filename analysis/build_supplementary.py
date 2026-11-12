@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Build the Supplementary Materials (Tables S1-S12) from the result files in ../results.
+"""Build the Supplementary Materials (Tables S1-S13) from the result files in ../results.
 Tables and table parts that are new in the revised version are highlighted (HL = True)."""
 import sys
 from pathlib import Path
@@ -300,5 +300,21 @@ para('Sensitivity of the fine-tuned models to the weight λ of the cast data (me
      'leave-one-out evaluation and not optimised on the held-out steels. This is a separate run, so that the tree-model values at λ = 5 differ from Table 8 by up to 0.7 J because of the '
      'random row and column subsampling of the boosting rounds.', new=True)
 table(['Model', 'λ = 1', 'λ = 5', 'λ = 20'], rows, [4.0, 2.4, 2.4, 2.4], new=True)
+
+d.add_page_break()
+# ------------------------------------------------------------------ Table S13: robustness of the rank correlations
+cr = pd.read_csv(RES / 'supp_corr_robustness.csv')
+NM = {'T_temp': 'Tempering temperature', 'HJ_temper': 'PHJ', 'Ms_Andrews': 'Ms (Andrews)', 'Q_temp': 'Austenitising temperature', 'Q_time': 'Austenitising time', 'T_time': 'Tempering time',
+      'T_type': 'Tempering cooling rate', 'Rolled_Forged_Cast': 'Product form (cast = 0)'}
+def _rho(r, k):
+    v, p_ = r.get('rho_' + k), r.get('p_' + k)
+    return '–' if pd.isna(v) else f'{v:+.2f}'.replace('-', '−') + (' **' if p_ < 0.01 else ' *' if p_ < 0.05 else '')
+rows = [[NM.get(r.descriptor, r.descriptor), f'{int(r.n_nonzero)} / {int(r.n_nonzero_resolved)}', _rho(r, 'Tt_all'), _rho(r, 'Tt_resolved'), _rho(r, 'Tt_reported'),
+         _rho(r, 'USE_all'), _rho(r, 'USE_resolved'), _rho(r, 'USE_reported')] for _, r in cr.iterrows()]
+para(f'**Table S13.** Robustness of the Spearman rank correlations between descriptors and fitted curve parameters (Table 5 of the article): all {len(fu)} complete curves, the {nres} well-resolved curves only '
+     '(classification of Table S6), and, for elements that many sources do not report and that are then entered as zero, the curves with a reported (non-zero) value only. '
+     'The second column gives the number of curves with a non-zero value of the descriptor among all and among the well-resolved curves. ** p < 0.01, * p < 0.05.', new=True)
+table(['Descriptor', 'Non-zero (all / well resolved)', 'Tt, all curves', 'Tt, well resolved', 'Tt, reported values only', 'USE, all curves', 'USE, well resolved', 'USE, reported values only'],
+      rows, [5.0, 3.6, 2.6, 2.6, 3.0, 2.6, 2.6, 3.0], new=True)
 
 out = ROOT / ('Supplementary_Materials_ver5_revised.docx' if HL else 'Supplementary_Materials_ver5_clean.docx'); d.save(out); print('written', out)

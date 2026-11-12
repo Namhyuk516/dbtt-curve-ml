@@ -38,6 +38,7 @@ python analysis/20_revision_cv.py fullsize_same_test    # Table 7; also: publica
 python analysis/21_param_accuracy_resolved.py           # Table S6: well-resolved vs poorly resolved reference curves
 python analysis/22_cast_revision.py                     # Table 9, Tables S11 and S12
 python analysis/23_figures_large_text.py                # re-draws the figures of the article with larger lettering
+python analysis/24_corr_robustness.py                   # Table S13: robustness of the rank correlations
 ```
 `analysis/run_pipeline.ps1` runs everything after tuning in four parallel chains (Windows PowerShell; edit the Python path at the top).
 

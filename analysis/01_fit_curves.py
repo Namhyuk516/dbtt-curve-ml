@@ -26,7 +26,7 @@ print('\nmedian R2 =', par.R2.median().round(3), ' n curves =', len(par), ' R2>0
 
 # figure: 12 example fits
 sel = par.sort_values('nT', ascending=False).head(12)
-fig, axs = plt.subplots(3, 4, figsize=(14, 9)); axs = axs.ravel()
+fig, axs = plt.subplots(4, 3, figsize=(11, 13)); axs = axs.ravel()
 for ax, (_, r) in zip(axs, sel.iterrows()):
     g = df[df.cond == r.cond]; Tg = np.linspace(g.test_temp.min()-30, g.test_temp.max()+30, 200)
     ax.plot(g.test_temp, g.Impact, 'o', c='k', ms=4, label='data')

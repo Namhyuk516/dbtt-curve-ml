@@ -10,7 +10,7 @@ svp = np.load(RES / 'shap_tanh_xgb_params.npy'); U = df.drop_duplicates('cond').
 panels = [('(a) XGB-direct: energy (J)', sv, pd.DataFrame(df[FEATS].values, columns=nice(FEATS))),
           ('(b) tanh-XGB: ' + TT + ' (°C)', svp[2], pd.DataFrame(U[ALLOY_FEATS].values, columns=nice(ALLOY_FEATS))),
           ('(c) tanh-XGB: USE (J)', svp[1], pd.DataFrame(U[ALLOY_FEATS].values, columns=nice(ALLOY_FEATS)))]
-fig = plt.figure(figsize=(21, 7.5))
+fig = plt.figure(figsize=(21, 9))
 for k, (title, s, X) in enumerate(panels):
     ax = fig.add_subplot(1, 3, k + 1); plt.sca(ax)
     shap.summary_plot(s, X, show=False, max_display=12, plot_size=None, color_bar=(k == 2))

@@ -8,7 +8,7 @@ examples = ['Carbon_steel', 'G18CrMo2-6_steel', 'AISI1018', 'DP590', 'P92', 'QT_
 which = ['XGB-direct', 'tanh-XGB', 'tanh-NN']; COL = {'XGB-direct': 'C0', 'tanh-XGB': 'C3', 'tanh-NN': 'C1'}
 final = {m: MODELS[m]().fit(df) for m in which}
 Tg = np.linspace(-200, 250, 91); rows = []
-fig, axs = plt.subplots(3, 3, figsize=(15, 11)); axs = axs.ravel()
+fig, axs = plt.subplots(3, 3, figsize=(15, 14)); axs = axs.ravel()
 for ax, al in zip(axs, examples):
     te = df[df.Alloy == al]; aid = te.alloy_id.iloc[0]; cond = te.groupby('cond').size().idxmax(); g = te[te.cond == cond]
     row = g.iloc[[0] * len(Tg)].copy(); row['test_temp'] = Tg
@@ -19,7 +19,7 @@ for ax, al in zip(axs, examples):
         rows.append(dict(Alloy=al, label=alloy_label(df, al), model=m, n_points=len(g), MAE_heldout=metrics(g.Impact, held.predict(g))['MAE'], MAE_final=metrics(g.Impact, final[m].predict(g))['MAE']))
     ax.plot(g.test_temp, g.Impact, 'ko', ms=5, label='measured')
     ax.set_title(f'{alloy_label(df, al)} (temper {g.T_temp.iloc[0]:.0f}°C)', fontsize=10); ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, None); ax.grid(alpha=.3)
-h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=4, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.06, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_final_vs_heldout.png', dpi=140)
+h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=2, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.06, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_final_vs_heldout.png', dpi=140)
 r = pd.DataFrame(rows); r.to_csv(RES / 'final_vs_heldout_examples.csv', index=False)
 print(r.pivot(index='Alloy', columns='model', values=['MAE_heldout', 'MAE_final']).round(1).to_string())
 print('\nin-sample (all points):')

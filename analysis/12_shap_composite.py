@@ -7,7 +7,7 @@ plt.rcParams.update({'font.size': 15})
 df = load(); nice = lambda cols: [NICE.get(c, c) for c in cols]
 m = XGBDirect().fit(df); sv = shap.TreeExplainer(m.m).shap_values(df[FEATS].values)
 svp = np.load(RES / 'shap_tanh_xgb_params.npy'); U = df.drop_duplicates('cond').reset_index(drop=True)
-panels = [('(a) XGB-direct: impact energy (J)', sv, pd.DataFrame(df[FEATS].values, columns=nice(FEATS))),
+panels = [('(a) XGB-direct: energy (J)', sv, pd.DataFrame(df[FEATS].values, columns=nice(FEATS))),
           ('(b) tanh-XGB: ' + TT + ' (°C)', svp[2], pd.DataFrame(U[ALLOY_FEATS].values, columns=nice(ALLOY_FEATS))),
           ('(c) tanh-XGB: USE (J)', svp[1], pd.DataFrame(U[ALLOY_FEATS].values, columns=nice(ALLOY_FEATS)))]
 fig = plt.figure(figsize=(21, 7.5))

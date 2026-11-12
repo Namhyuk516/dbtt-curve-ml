@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Build Supplementary_Materials.docx (Tables S1-S4) from the result files in ../results."""
+"""Build the Supplementary Materials (Tables S1-S12) from the result files in ../results.
+Tables and table parts that are new in the revised version are highlighted (HL = True)."""
 import sys
 from pathlib import Path
 import numpy as np, pandas as pd
@@ -23,12 +24,18 @@ for m in ('left_margin', 'right_margin', 'top_margin', 'bottom_margin'): setattr
 st = d.styles['Normal']; st.font.name = 'Palatino Linotype'; st.font.size = Pt(10)
 
 
-def para(text, bold=False, size=10, align=None, after=6):
+HL = 'clean' not in sys.argv          # highlight what is new in the revised version (python build_supplementary.py clean -> no highlighting)
+from docx.enum.text import WD_COLOR_INDEX
+
+
+def para(text, bold=False, size=10, align=None, after=6, new=False):
     p = d.add_paragraph(); p.paragraph_format.space_after = Pt(after)
     if align: p.alignment = align
     for k, seg in enumerate(re.split(r'\*\*', text)):
-        if seg:
-            r = p.add_run(seg); r.bold = bold or k % 2 == 1; r.font.size = Pt(size)
+        for j, part in enumerate(re.split(r'<sup>|</sup>', seg)):
+            if part:
+                r = p.add_run(part); r.bold = bold or k % 2 == 1; r.font.size = Pt(size); r.font.superscript = j % 2 == 1
+                if new and HL: r.font.highlight_color = WD_COLOR_INDEX.YELLOW
     return p
 
 
@@ -38,13 +45,14 @@ def rule(cell, edge, sz=8):
     e = OxmlElement(f'w:{edge}'); e.set(qn('w:val'), 'single'); e.set(qn('w:sz'), str(sz)); e.set(qn('w:space'), '0'); e.set(qn('w:color'), 'auto'); b.append(e)
 
 
-def table(header, rows, widths, size=8, align_left=(0,)):
+def table(header, rows, widths, size=8, align_left=(0,), new=False, new_rows=()):
     t = d.add_table(rows=1 + len(rows), cols=len(header)); t.autofit = False
     for i, row in enumerate([header] + rows):
         for j, v in enumerate(row):
             c = t.cell(i, j); c.width = Cm(widths[j]); p = c.paragraphs[0]; p.paragraph_format.space_after = Pt(0)
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT if j in align_left else WD_ALIGN_PARAGRAPH.CENTER
             r = p.add_run(str(v)); r.font.size = Pt(size); r.bold = i == 0
+            if HL and (new or (i - 1) in new_rows): r.font.highlight_color = WD_COLOR_INDEX.YELLOW
             if i == 0: rule(c, 'top'); rule(c, 'bottom', 4)
             if i == len(rows): rule(c, 'bottom')
     d.add_paragraph().paragraph_format.space_after = Pt(4)
@@ -56,7 +64,10 @@ f1 = lambda v: '–' if pd.isna(v) else f'{v:.1f}'.replace('-', '−')
 SC = ['random', 'unseen-condition', 'unseen-alloy']
 
 para('Supplementary Materials', bold=True, size=14, after=4)
-para(TITLE, bold=True, size=11, after=12)
+para(TITLE, bold=True, size=11, after=8)
+para(C.AUTHORS.replace('<sup>1,</sup>*', '<sup>1,</sup>*'), size=10, after=4)
+for a_ in C.AFFILIATIONS: para(a_, size=8, after=2)
+para('', after=6)
 
 # ------------------------------------------------------------------ Table S1: data sources
 from common import load
@@ -142,36 +153,52 @@ para(f'**Table S4.** Cross-validation results after removing the {n1} conditions
 table(['Model', 'Data'] + HDR, rows, [2.6, 5.6, 2.3, 2.7, 2.7, 3.1, 2.5, 3.0])
 d.add_page_break()
 
-# ------------------------------------------------------------------ Table S5: nested cross-validation (tree models)
-nc = pd.concat([pd.read_csv(f) for f in RES.glob('nested_cv_*.csv')]).set_index(['model', 'scenario'])
+# ------------------------------------------------------------------ Table S5: nested cross-validation (all tuned models)
+cv0 = pd.read_csv(RES / 'cv_all.csv'); cv0 = cv0[cv0.rep == 0].set_index(['model', 'scenario'])
+nc = pd.concat([pd.read_csv(f) for f in RES.glob('nested_cv_*.csv') if 'selected' not in f.name]).set_index(['model', 'scenario'])
 rows = []
-for model in ['XGB-direct', 'XGB-direct-mono', 'tanh-XGB']:
+for model in ['XGB-direct', 'XGB-direct-mono', 'tanh-XGB', 'NN-direct', 'tanh-NN']:
     r = [model]
-    for s in ['unseen-condition', 'unseen-alloy']:
-        r += [f3(cvs.loc[(model, s), 'R2_mean']), f1(cvs.loc[(model, s), 'MAE_mean']), f3(nc.loc[(model, s), 'R2']), f1(nc.loc[(model, s), 'MAE'])]
+    for s_ in ['unseen-condition', 'unseen-alloy']:
+        r += [f3(cv0.loc[(model, s_), 'R2']), f1(cv0.loc[(model, s_), 'MAE']), f3(nc.loc[(model, s_), 'R2']), f1(nc.loc[(model, s_), 'MAE']), f3(nc.loc[(model, s_), 'R2'] - cv0.loc[(model, s_), 'R2'])]
     rows.append(r)
-para(f'**Table S5.** Nested cross-validation of the tuned tree models. In the nested procedure the hyper-parameters are re-selected inside every outer fold '
-     f'(Optuna, {int(nc.n_inner.iloc[0])} trials on an inner five-fold grouped split of the training folds), so that no information from the held-out fold enters the '
-     'selection; outer: five-fold grouped split, one repetition. "Table 6" denotes the values obtained with the globally tuned hyper-parameters.')
-table(['Model', 'Unseen cond. R² (Table 6)', 'Unseen cond. MAE (Table 6)', 'Unseen cond. R² (nested)', 'Unseen cond. MAE (nested)',
-       'Unseen steel R² (Table 6)', 'Unseen steel MAE (Table 6)', 'Unseen steel R² (nested)', 'Unseen steel MAE (nested)'], rows, [2.8, 2.8, 2.9, 2.8, 2.9, 2.8, 2.9, 2.8, 2.9])
+para('**Table S5.** Nested cross-validation of the five tuned models. In the nested procedure the hyper-parameters are re-selected inside every outer fold, so that no '
+     'information from the held-out fold enters the selection (tree models: Optuna, 20 trials on an inner five-fold grouped split of the training folds; neural networks: '
+     '15 trials on an inner three-fold grouped split with ensembles of three networks, the selected configuration being refitted as an ensemble of five). Outer: five-fold '
+     'grouped split, one repetition. "Global" denotes the hyper-parameters selected once on the whole database (Section 2.4), evaluated on the same fold assignment as the '
+     'nested procedure (repetition 1 of Table 6; the three-repetition means of Table 6 are lower, e.g., 0.29–0.32 for the tree models under unseen-steel splitting). '
+     'ΔR² = nested − global; negative values indicate an optimistic bias of the globally tuned estimate.', new=True)
+table(['Model', 'Unseen cond. R² (global)', 'Unseen cond. MAE (global)', 'Unseen cond. R² (nested)', 'Unseen cond. MAE (nested)', 'Unseen cond. ΔR²',
+       'Unseen steel R² (global)', 'Unseen steel MAE (global)', 'Unseen steel R² (nested)', 'Unseen steel MAE (nested)', 'Unseen steel ΔR²'], rows,
+      [2.6, 2.3, 2.3, 2.3, 2.3, 2.0, 2.3, 2.3, 2.3, 2.3, 2.0], new=True)
 
 # ------------------------------------------------------------------ Table S6: parameter-level accuracy of the equation-based models
-pa_path = RES / 'supp_param_accuracy.csv'
-if pa_path.exists():
-    pa = pd.read_csv(pa_path); pm = pa.groupby(['model', 'scenario'])[['MAE_Tt', 'bias_Tt', 'MAE_USE', 'bias_USE', 'within30', 'n']].mean()
-    fu = pd.read_csv(RES / 'curve_fit_uncertainty.csv')
-    rows = []
-    for model in ['two-stage', 'tanh-XGB', 'tanh-NN']:
-        for s in ['unseen-condition', 'unseen-alloy']:
-            q = pm.loc[(model, s)]
-            rows.append([disp(model), s.replace('unseen-alloy', 'unseen steel').replace('unseen-condition', 'unseen condition'), f1(q.MAE_Tt), f1(q.bias_Tt), f1(q.MAE_USE), f1(q.bias_USE), f'{100 * q.within30:.0f}%'])
-    para(f'**Table S6.** Accuracy of the curve parameters predicted by the equation-based models for the {int(pa.n.max())} conditions with complete curves, '
-         'compared with the parameters fitted directly to the measurements (Equation (1)); grouped cross-validation, mean of three repetitions. '
-         f'For reference, the fitted parameters have standard deviations of {fu.Tt.std():.0f} °C (<i>T</i><sub>t</sub>) and {fu.USE.std():.0f} J (USE) across the '
-         f'{len(fu)} curves, and their median standard errors from the least-squares fit are {fu.se_Tt.median():.1f} °C and {fu.se_USE.median():.1f} J. '
-         '"Within 30 °C" is the fraction of conditions whose predicted <i>T</i><sub>t</sub> lies within ±30 °C of the fitted value.'.replace('<i>T</i><sub>t</sub>', 'Tt'))
-    table(['Model', 'Scheme', 'MAE Tt (°C)', 'Bias Tt (°C)', 'MAE USE (J)', 'Bias USE (J)', 'Within 30 °C'], rows, [2.8, 3.4, 2.6, 2.6, 2.6, 2.6, 2.6])
+pr = pd.read_csv(RES / 'supp_param_accuracy_percond.csv'); fu = pd.read_csv(RES / 'curve_fit_uncertainty_resolved.csv')
+pr['eT'] = pr.Tt_pred - pr.Tt_fit; pr['eU'] = pr.USE_pred - pr.USE_fit
+def _acc(g):
+    q = g.groupby('rep').apply(lambda x: pd.Series(dict(MAE_Tt=x.eT.abs().mean(), bias_Tt=x.eT.mean(), MAE_USE=x.eU.abs().mean(), bias_USE=x.eU.mean(), within30=(x.eT.abs() <= 30).mean()))).mean()
+    return [f1(q.MAE_Tt), f1(q.bias_Tt), f1(q.MAE_USE), f1(q.bias_USE), f'{100 * q.within30:.0f}%']
+nres = int(fu.resolved.sum()); rows = []; newr = []
+for model in ['two-stage', 'tanh-XGB', 'tanh-NN']:
+    for s_ in ['unseen-condition', 'unseen-alloy']:
+        g = pr[(pr.model == model) & (pr.scenario == s_)]; sl = s_.replace('unseen-alloy', 'unseen steel').replace('unseen-condition', 'unseen condition')
+        rows.append([disp(model), sl, f'all ({len(fu)})'] + _acc(g))
+        newr += [len(rows), len(rows) + 1]
+        rows.append([disp(model), sl, f'well resolved ({nres})'] + _acc(g[g.resolved]))
+        rows.append([disp(model), sl, f'poorly resolved ({len(fu) - nres})'] + _acc(g[~g.resolved]))
+sd = lambda m, c: fu.loc[m, c].std()
+para(f'**Table S6.** Accuracy of the curve parameters predicted by the equation-based models for the {len(fu)} conditions with complete curves, '
+     'compared with the parameters fitted directly to the measurements (Equation (1)); grouped cross-validation, mean of three repetitions. '
+     f'For reference, the fitted parameters have standard deviations of {fu.Tt.std():.0f} °C (Tt) and {fu.USE.std():.0f} J (USE) across the '
+     f'{len(fu)} curves, and their median standard errors from the least-squares fit are {fu.se_Tt.median():.1f} °C and {fu.se_USE.median():.1f} J (fits with a singular covariance matrix counted as infinite). '
+     '"Within 30 °C" is the fraction of conditions whose predicted Tt lies within ±30 °C of the fitted value.')
+para(f'All {len(fu)} fitted curves are used as reference values in the rows "all", irrespective of the quality of the fit. A reference curve is classed as well resolved when the '
+     'least-squares fit has a non-singular covariance matrix, standard errors of at most 20 °C in Tt and 20 J in USE, no USE or Cw at a bound, and Tt inside the tested '
+     f'temperature range; {nres} curves meet these criteria (median of {fu[fu.resolved].nT.median():.0f} test temperatures over {fu[fu.resolved].Trange.median():.0f} °C; standard deviation of the fitted values '
+     f'{sd(fu.resolved, "Tt"):.0f} °C and {sd(fu.resolved, "USE"):.0f} J) and {len(fu) - nres} do not (median of {fu[~fu.resolved].nT.median():.0f} test temperatures over {fu[~fu.resolved].Trange.median():.0f} °C; '
+     f'{sd(~fu.resolved, "Tt"):.0f} °C and {sd(~fu.resolved, "USE"):.0f} J). For the poorly resolved curves the reference values themselves are uncertain, so the errors in those rows are indicative only.', new=True)
+table(['Model', 'Scheme', 'Reference curves', 'MAE Tt (°C)', 'Bias Tt (°C)', 'MAE USE (J)', 'Bias USE (J)', 'Within 30 °C'], rows, [2.6, 3.2, 3.8, 2.4, 2.4, 2.4, 2.4, 2.4], new_rows=newr)
+d.add_page_break()
 # ------------------------------------------------------------------ Table S7: full-size-specimen sources only
 fs_path = RES / 'supp_fullsize.csv'
 if fs_path.exists():
@@ -203,4 +230,75 @@ if cs_path.exists():
     table(['Model', 'Rank', 'Width / dropout / learning rate / weight decay / epochs', 'Objective', 'Cast MAE (J)', 'Cast R²'], rows, [2.4, 1.2, 8.0, 2.2, 2.6, 2.2], align_left=(2,))
     d.add_page_break()
 
-out = ROOT / 'Supplementary_Materials.docx'; d.save(out); print('written', out)
+# ------------------------------------------------------------------ Table S9: leave-publication-out cross-validation
+pb = pd.read_csv(RES / 'supp_publication.csv'); pg_ = pb.groupby('model')[['R2', 'MAE', 'RMSE']].agg(['mean', 'std'])
+rows = [[disp(m_), f3(cvs.loc[(m_, 'unseen-alloy'), 'R2_mean']), f1(cvs.loc[(m_, 'unseen-alloy'), 'MAE_mean']), f3(pg_.loc[m_, ('R2', 'mean')]), f3(pg_.loc[m_, ('R2', 'std')]),
+         f1(pg_.loc[m_, ('MAE', 'mean')]), f1(pg_.loc[m_, ('RMSE', 'mean')])] for m_ in MODELS6]
+para('**Table S9.** Cross-validation with whole publications held out (five folds grouped by source publication, mean of three repetitions; same hyper-parameters as '
+     'Table 6), compared with the unseen-steel scheme of Table 6. No steel of the database occurs in more than one publication, but 10 of the 40 publications contribute '
+     'two to six steels, so that under steel grouping other steels of the same publication (same laboratory, specimen geometry and testing practice) can be present in the '
+     'training folds; holding out whole publications removes this possible source of leakage.', new=True)
+table(['Model', 'Unseen steel R² (Table 6)', 'Unseen steel MAE (J) (Table 6)', 'Unseen publication R²', 'SD of R² over repetitions', 'Unseen publication MAE (J)', 'Unseen publication RMSE (J)'],
+      rows, [2.8, 3.2, 3.6, 3.2, 3.4, 3.4, 3.4], new=True)
+
+# ------------------------------------------------------------------ Table S10: two-stage versus end-to-end learning on the same training conditions
+tf = pd.read_csv(RES / 'supp_twostage_fair.csv'); tm = tf.groupby(['variant', 'scenario'])[['n_train', 'R2', 'MAE', 'R2_complete', 'MAE_complete']].mean()
+import json as _json
+tp = _json.load(open(RES / 'tuned_two-stage_revision.json'))['params']
+LAB = [('two-stage (fixed settings)', 'Two-stage, fixed settings (Table 6)', 'complete curves'), ('two-stage (tuned)', 'Two-stage, tuned regressors', 'complete curves'),
+       ('tanh-XGB, complete curves only', 'tanh-XGB, end-to-end', 'complete curves'), ('tanh-NN, complete curves only', 'tanh-NN, end-to-end', 'complete curves'),
+       ('tanh-XGB, all measurements', 'tanh-XGB, end-to-end (Table 6)', 'all measurements'), ('tanh-NN, all measurements', 'tanh-NN, end-to-end (Table 6)', 'all measurements')]
+rows = []
+for key, lab, data in LAB:
+    r = [lab, data]
+    for s_ in SC: r += [f3(tm.loc[(key, s_), 'R2']), f3(tm.loc[(key, s_), 'R2_complete']), f1(tm.loc[(key, s_), 'MAE_complete'])]
+    rows.append(r)
+para('**Table S10.** Two-stage and end-to-end learning with the same training data. "Complete curves" denotes training on the conditions of the training folds that were '
+     'tested at four or more temperatures, i.e., the conditions that the two-stage procedure can use; "all measurements" the full training folds. All variants are evaluated on '
+     'the same held-out measurements: R² (all) refers to all held-out measurements as in Table 6, R² (cc) and MAE (cc) to the held-out measurements that belong to complete-curve '
+     f'conditions ({int((df.groupby("cond").test_temp.transform("nunique") >= 4).sum())} measurements). The tuned two-stage regressors were selected with the Optuna procedure of Section 2.4 (30 trials; '
+     f'{int(tp["n_estimators"])} trees, learning rate {tp["learning_rate"]:.4f}, depth {int(tp["max_depth"])}, minimum child weight {tp["min_child_weight"]:.1f}, λ = {tp["reg_lambda"]:.2f}, '
+     f'column/row subsampling {tp["colsample_bytree"]:.2f}/{tp["subsample"]:.2f}); the end-to-end models use the settings of Section 2.4, which were tuned on all measurements. '
+     'Five folds, mean of three repetitions.', new=True)
+table(['Model', 'Training data', 'Random R² (all)', 'Random R² (cc)', 'Random MAE (cc)', 'Unseen cond. R² (all)', 'Unseen cond. R² (cc)', 'Unseen cond. MAE (cc)',
+       'Unseen steel R² (all)', 'Unseen steel R² (cc)', 'Unseen steel MAE (cc)'], rows, [5.2, 2.8, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0], new=True)
+d.add_page_break()
+
+# ------------------------------------------------------------------ Table S11: undetermined elements of the cast steels
+mc = pd.read_csv(RES / 'cast_missing_chemistry_sensitivity.csv'); order_ = list(dict.fromkeys(mc.scenario))
+pv = mc.pivot(index='scenario', columns='model', values='MAE'); tt_ = mc.pivot(index='scenario', columns='model', values='Tt'); us_ = mc.pivot(index='scenario', columns='model', values='USE')
+def _val(sc_):
+    q = mc[mc.scenario == sc_].iloc[0]
+    return ' / '.join('0' if pd.isna(q[e]) else f'{q[e]:.3f}'.rstrip('0').rstrip('.') for e in ['P', 'S', 'N', 'Al'])
+LBL = {'as analysed (undetermined elements = 0)': 'As analysed (main analysis)', 'P, S = database medians': 'P, S at database medians', 'P, S, N = database medians': 'P, S, N at database medians',
+       'P, S, N, Al = database medians': 'P, S, N, Al at database medians', 'P, S, N = upper quartiles': 'P, S, N at upper quartiles', 'P, S, N, Al = upper quartiles': 'P, S, N, Al at upper quartiles',
+       'P = 0.020, S = 0.020, N = 0.010, Al = 0': 'High P, S and N'}
+rows = [[LBL[sc_], _val(sc_)] + [f1(pv.loc[sc_, m_]) for m_ in MODELS6] + [f'{tt_.loc[sc_, "tanh-NN"]:.0f} / {us_.loc[sc_, "tanh-NN"]:.0f}'.replace('-', '−')] for sc_ in order_]
+para('**Table S11.** Sensitivity of the external test to the elements that were not analysed in the cast steels (P, S, N and Al; entered as zero in the main analysis). '
+     'The literature-trained models of Table 8 were evaluated on the 32 cast-steel measurements after assigning the same assumed concentrations (wt.%) to all four steels: '
+     'the medians or upper quartiles of the non-zero values in the literature database, or a high-impurity case. The physics-derived descriptors were recomputed. '
+     'The last column gives the mean transition temperature and upper-shelf energy predicted by tanh-NN for the four steels.', new=True)
+table(['Assumed concentrations', 'P / S / N / Al (wt.%)'] + [disp(m_) + ' MAE (J)' for m_ in MODELS6] + ['tanh-NN Tt (°C) / USE (J)'], rows,
+      [5.6, 4.2, 2.1, 2.5, 2.1, 2.1, 2.1, 2.1, 3.0], new=True)
+
+# ------------------------------------------------------------------ Table S12: cast-only baselines and cast-data weight
+cb = pd.read_csv(RES / 'cast_only_baselines_LOCO.csv'); ls = pd.read_csv(RES / 'finetune_lambda_sensitivity.csv'); ft = pd.read_csv(RES / 'finetune_LOCO_derived.csv')
+AL = ['MSN', 'MSNN', 'MSCM', 'MSCMN']; rows = []
+BL = {'mean of the other three steels at each temperature': 'Cast data only: mean of the three training steels at each test temperature', 'pooled straight line': 'Cast data only: straight line fitted to the 24 measurements',
+      'pooled tanh curve': 'Cast data only: Equation (1) fitted to the 24 measurements'}
+for k_, lab in BL.items():
+    g = cb[cb.baseline == k_].set_index('alloy'); rows.append([lab] + [f1(g.MAE[a_]) for a_ in AL] + [f1(g.MAE.mean()), f3(g.R2.mean())])
+for m_ in ['tanh-NN', 'NN-direct', 'tanh-XGB', 'XGB-direct', 'XGB-direct-mono']:
+    for meth, lab in [('calib', 'linear re-calibration'), ('ft', 'fine-tuning, λ = 5')]:
+        g = ft[(ft.model == m_) & (ft.method == meth)].set_index('alloy'); rows.append([f'{m_}: {lab} (Table 8)'] + [f1(g.MAE[a_]) for a_ in AL] + [f1(g.MAE.mean()), f3(g.R2.mean())])
+para('**Table S12.** Leave-one-cast-steel-out errors (MAE, J) on the held-out cast steel: baselines that use only the 24 measurements of the three training cast steels, without any '
+     'literature data, compared with the adapted literature-trained models of Table 8. The pooled tanh curve was fitted with the bounds of Section 2.2.', new=True)
+table(['Method'] + AL + ['Mean MAE (J)', 'Mean R²'], rows, [10.5, 2.0, 2.0, 2.0, 2.0, 2.6, 2.2], new=True)
+lm = ls.groupby(['model', 'lam']).MAE.mean().unstack()
+rows = [[m_] + [f1(lm.loc[m_, l_]) for l_ in [1.0, 5.0, 20.0]] for m_ in ['tanh-NN', 'NN-direct', 'tanh-XGB', 'XGB-direct', 'XGB-direct-mono']]
+para('Sensitivity of the fine-tuned models to the weight λ of the cast data (mean MAE over the four held-out steels, J). λ = 5 is the value used in Table 8; it was fixed before the '
+     'leave-one-out evaluation and not optimised on the held-out steels. This is a separate run, so that the tree-model values at λ = 5 differ from Table 8 by up to 0.7 J because of the '
+     'random row and column subsampling of the boosting rounds.', new=True)
+table(['Model', 'λ = 1', 'λ = 5', 'λ = 20'], rows, [4.0, 2.4, 2.4, 2.4], new=True)
+
+out = ROOT / ('Supplementary_Materials_ver5_revised.docx' if HL else 'Supplementary_Materials_ver5_clean.docx'); d.save(out); print('written', out)

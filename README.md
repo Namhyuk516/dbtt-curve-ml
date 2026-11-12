@@ -6,8 +6,8 @@ Empirical-Equation-Constrained Models with Validation on In-House Cast Steels* (
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23384571.svg)](https://doi.org/10.5281/zenodo.23384571)
 
 ## Citation
-Seo, N.; Park, J.-W.; Yang, J.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.1.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
-(see CITATION.cff; the version used in the manuscript is 10.5281/zenodo.23460289).
+Seo, N.; Park, J.-W.; Yang, J.; Lee, S.-J.; Kim, M.-S. dbtt-curve-ml: data and code for 'Learning the Ductile-to-Brittle Transition Curve of Steels' (v1.2.0). Zenodo, 2026. https://doi.org/10.5281/zenodo.23384571
+(see CITATION.cff; v1.1.0, 10.5281/zenodo.23460289, corresponds to the submitted manuscript and v1.2.0 to the revised manuscript).
 
 ## Contents
 - `data/charpy_literature_database.csv` – the 604 literature Charpy V-notch measurements used in the article (cp949 encoding; 58 steels, 169 alloy/heat-treatment conditions, 40 publications). Column `No` is the record number used in `data/TableS1_sources.csv` (row ranges per source publication). `data/TableS1_specimens.csv` lists the Charpy specimen size, notch, test standard and orientation stated in each source. Test and heat-treatment temperatures are stored in K.
@@ -31,6 +31,13 @@ python analysis/04_cast.py; python analysis/05_shap.py; python analysis/12_shap_
 python analysis/13_supp_cv.py ablation_tree; python analysis/13_supp_cv.py ablation_nn; python analysis/13_supp_cv.py multi_temp
 python analysis/15_nested_cv.py XGB-direct 20   # also XGB-direct-mono, tanh-XGB
 python analysis/10_eda.py
+python analysis/16_param_accuracy.py; python analysis/17_cast_config_sensitivity.py; python analysis/18_cast_extra.py
+# analyses added in the revised manuscript (v1.2.0)
+python analysis/19_nested_cv_nn.py NN-direct 15         # also tanh-NN: nested cross-validation of the neural networks (Table S5)
+python analysis/20_revision_cv.py fullsize_same_test    # Table 7; also: publication (Table S9), twostage_fair (Table S10)
+python analysis/21_param_accuracy_resolved.py           # Table S6: well-resolved vs poorly resolved reference curves
+python analysis/22_cast_revision.py                     # Table 9, Tables S11 and S12
+python analysis/23_figures_large_text.py                # re-draws the figures of the article with larger lettering
 ```
 `analysis/run_pipeline.ps1` runs everything after tuning in four parallel chains (Windows PowerShell; edit the Python path at the top).
 

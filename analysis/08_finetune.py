@@ -95,9 +95,9 @@ for name in which:
     fig, axs = plt.subplots(1, 4, figsize=(18, 4.2))
     for ax, al in zip(axs, cast.Alloy):
         meas = CAST_MEAS[CAST_MEAS.Alloy == al]; c = curves[(name, al)]
-        for meth, lab in [('none', 'pre-trained (literature only)'), ('calib', 'linear re-calibration'), ('ft', 'fine-tuned on other 3 cast alloys')]:
+        for meth, lab in [('none', 'pre-trained (literature only)'), ('calib', 'linear re-calibration'), ('ft', 'fine-tuned on the other three cast steels')]:
             ax.plot(Tg, c[meth], c=COL[meth], label=lab, lw=1.8)
         ax.plot(meas.test_temp, meas.Impact, 'ko', ms=5, label='measured (held out)')
-        ax.set_title(f'{name}: {al} (LOCO)', fontsize=10); ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, 300); ax.grid(alpha=.3)
-    axs[0].legend(fontsize=7); plt.tight_layout(); plt.savefig(RES / f'fig_finetune_{name}.png', dpi=140); plt.close()
+        ax.set_title(f'{name}: {al} held out', fontsize=10); ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, 300); ax.grid(alpha=.3)
+    h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=4, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.13, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / f'fig_finetune_{name}.png', dpi=140); plt.close()
 print('done')

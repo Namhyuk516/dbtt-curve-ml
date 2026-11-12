@@ -94,7 +94,8 @@ for ax, c in zip(axs[1], ['C', 'HJ_temper', 'Ms_Andrews', 'Ni']):
     for k, g in par.groupby('cls'): ax.scatter(g[c], g.USE, s=25, label=k)
     ax.set_xlabel(nice(c)); ax.set_ylabel('USE (J)'); ax.grid(alpha=.3)
     r, pv_ = stats.spearmanr(par[c], par.USE); ax.set_title(f'rho={r:+.2f}, p={pv_:.3f}', fontsize=9)
-axs[0, 0].legend(fontsize=7); plt.tight_layout(); plt.savefig(RES / 'eda_fig_curveparams_vs_features.png', dpi=140); plt.close()
+h_, l_ = axs[0, 0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=5, fontsize=8, frameon=False, columnspacing=1.0, handletextpad=0.2)
+fig._tl_rect = (0, 0.06, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'eda_fig_curveparams_vs_features.png', dpi=140); plt.close()
 
 # ------------------------------------------------------------------ 5. tempering effect within alloys (same alloy, different T_temp)
 P('=== 5. within-alloy tempering effect (alloys with >=3 tempering conditions; Spearman of T_temp vs mean Impact at the common test temperature) ===')
@@ -127,8 +128,8 @@ fig, axs = plt.subplots(1, 2, figsize=(15, 5))
 order = cls_tab.index.tolist()
 for k in order:
     g = df[df.cls == k]; axs[0].scatter(g.test_temp, g.Impact, s=10, alpha=.6, label=f'{k} (n={len(g)})')
-axs[0].set_xlabel('Test T (°C)'); axs[0].set_ylabel('CVN (J)'); axs[0].legend(fontsize=7); axs[0].grid(alpha=.3); axs[0].set_title('All data points by steel class', fontsize=10)
-axs[1].boxplot([df[df.cls == k].Impact for k in order], tick_labels=[k.split(' (')[0] for k in order]); axs[1].set_ylabel('CVN (J)'); axs[1].tick_params(axis='x', labelsize=7); axs[1].set_title('Impact energy by steel class', fontsize=10)
+axs[0].set_xlabel('Test T (°C)'); axs[0].set_ylabel('CVN (J)'); axs[0].legend(fontsize=7, loc='upper left', framealpha=0.85, borderpad=0.3, labelspacing=0.25, handletextpad=0.2); axs[0].grid(alpha=.3); axs[0].set_title('(a) All data points by steel class', fontsize=10)
+axs[1].boxplot([df[df.cls == k].Impact for k in order], tick_labels=[k.split(' (')[0].replace(' / ', ' /\n').replace('Medium-Mn', 'Medium-\nMn').replace('Low-alloy', 'Low-\nalloy') for k in order]); axs[1].set_ylabel('CVN (J)'); axs[1].tick_params(axis='x', labelsize=7); axs[1].set_title('(b) Impact energy by steel class', fontsize=10)
 plt.tight_layout(); plt.savefig(RES / 'eda_fig_by_class.png', dpi=140); plt.close()
 # points per condition
 nT = df.groupby('cond').test_temp.nunique()

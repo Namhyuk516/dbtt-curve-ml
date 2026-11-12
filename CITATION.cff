@@ -23,8 +23,8 @@ authors:
     given-names: Min-Su
     email: mskim85@kitech.re.kr
     affiliation: "Jeonbuk Technology Application Division, Korea Institute of Industrial Technology, Gimje, Republic of Korea"
-version: v1.1.0
-date-released: 2026-10-19
+version: v1.2.0
+date-released: 2026-11-12
 doi: 10.5281/zenodo.23384571
 repository-code: https://github.com/Namhyuk516/dbtt-curve-ml
 license: MIT

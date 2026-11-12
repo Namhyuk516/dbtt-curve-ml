@@ -43,9 +43,9 @@ for ax, al in zip(axs, examples):
     row = g.iloc[[0] * len(Tg)].copy(); row['test_temp'] = Tg
     for m in which:
         mod = MODELS[m]().fit(df[tr]); ax.plot(Tg, mod.predict(row), c=COL[m], label=m, lw=1.6)
-    ax.plot(g.test_temp, g.Impact, 'ko', ms=5, label='measured (held-out alloy)')
+    ax.plot(g.test_temp, g.Impact, 'ko', ms=5, label='measured (held-out steel)')
     ax.set_title(f'{alloy_label(df, al)}  (temper {g.T_temp.iloc[0]:.0f}°C)', fontsize=10); ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, None); ax.grid(alpha=.3)
-axs[0].legend(fontsize=8); plt.tight_layout(); plt.savefig(RES / 'fig_heldout_curves_unseen_alloy.png', dpi=140); plt.close()
+h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=6, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.04, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_heldout_curves_unseen_alloy.png', dpi=140); plt.close()
 
 # ---- 3b. same but 'unseen-condition' scenario (other tempering conditions of the alloy are in training) ----
 fig, axs = plt.subplots(3, 3, figsize=(15, 11)); axs = axs.ravel()
@@ -58,16 +58,16 @@ for ax, al in zip(axs, ex2):
     ax.plot(g.test_temp, g.Impact, 'ko', ms=5, label='measured (held-out condition)')
     ax.set_title(f'{alloy_label(df, al)}  (temper {g.T_temp.iloc[0]:.0f}°C; {len(conds)-1} other conditions in training)', fontsize=9)
     ax.set_xlabel('Test T (°C)'); ax.set_ylabel('CVN (J)'); ax.set_ylim(0, None); ax.grid(alpha=.3)
-axs[0].legend(fontsize=8); plt.tight_layout(); plt.savefig(RES / 'fig_heldout_curves_unseen_condition.png', dpi=140); plt.close()
+h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=6, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.04, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_heldout_curves_unseen_condition.png', dpi=140); plt.close()
 
 # ---- 4. bar chart: R2 by scenario + NMI ----
 fig, axs = plt.subplots(1, 3, figsize=(15, 4))
-for ax, met, lab in zip(axs, ['R2', 'MAE', 'NMI'], ['R² (CVN, J)', 'MAE (J)', 'non-monotonicity index']):
+for ax, met, lab in zip(axs, ['R2', 'MAE', 'NMI'], ['R² (CVN, J)', 'MAE (J)', 'NMI']):
     w = 0.8 / len(ORDER)
     for j, m in enumerate(ORDER):
         t = tab[tab.model == m].set_index('scenario').reindex(scen)
         ax.bar(np.arange(3) + (j - (len(ORDER) - 1) / 2) * w, t[f'{met}_mean'], w, yerr=t[f'{met}_std'], color=COL[m], label=m, capsize=2)
-    ax.set_xticks(range(3)); ax.set_xticklabels(scen); ax.set_ylabel(lab); ax.grid(axis='y', alpha=.3)
+    ax.set_xticks(range(3)); ax.set_xticklabels(['random', 'unseen\ncondition', 'unseen\nsteel']); ax.set_ylabel(lab); ax.grid(axis='y', alpha=.3)
     if met == 'R2': ax.set_ylim(-0.5, 1); ax.axhline(0, c='k', lw=.6)
-axs[0].legend(fontsize=8); plt.tight_layout(); plt.savefig(RES / 'fig_cv_bars.png', dpi=150); plt.close()
+h_, l_ = axs[0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=6, fontsize=8, frameon=False, columnspacing=1.2, handletextpad=0.4); fig._tl_rect = (0, 0.10, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'fig_cv_bars.png', dpi=150); plt.close()
 print('figures done')

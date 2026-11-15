@@ -40,7 +40,7 @@ for al in cast.Alloy:
     dtr, dte = cd[cd.Alloy != al], cd[cd.Alloy == al]; T, E = dtr.test_temp.values.astype(float), dtr.Impact.values; yt = dte.Impact.values
     pm = dte.test_temp.map(dtr.groupby('test_temp').Impact.mean()).values                      # mean of the three steels at each temperature
     b, a = np.polyfit(T, E, 1); pl = a + b * dte.test_temp.values                             # pooled straight line
-    popt, _ = curve_fit(tanh_curve, T, E, p0=[min(15, 0.5 * E.min()), 220, -15, 20], bounds=([0, 0, -300, 3], [E.min(), 1.5 * E.max(), 400, 300]), maxfev=20000)
+    popt, _ = curve_fit(tanh_curve, T, E, p0=[min(15, 0.5 * E.min()), 220, -15, 20], bounds=([0, 0, -300, 3], [E.max(), 1.5 * E.max() + 5, 400, 300]), maxfev=20000)
     pt = tanh_curve(dte.test_temp.values.astype(float), *popt)                                 # pooled tanh curve, same bounds as Section 2.2
     for lab, p in [('mean of the other three steels at each temperature', pm), ('pooled straight line', pl), ('pooled tanh curve', pt)]:
         rows.append(dict(baseline=lab, alloy=al, **metrics(yt, p)))

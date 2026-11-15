@@ -12,7 +12,7 @@ from common import CAST_MEAS, RES, tanh_curve
 def fit(T, E):
     lo, hi = E.min(), E.max()
     p0 = [min(max(lo, 0.5), lo), hi, T[np.argmin(np.abs(E - (lo + hi) / 2))], 30]
-    return curve_fit(tanh_curve, T, E, p0=p0, bounds=([0, 0, -300, 3], [lo, 1.5 * hi + 5, 400, 300]), maxfev=20000)
+    return curve_fit(tanh_curve, T, E, p0=p0, bounds=([0, 0, -300, 3], [hi, 1.5 * hi + 5, 400, 300]), maxfev=20000)
 
 
 rng = np.random.RandomState(0); rows = []

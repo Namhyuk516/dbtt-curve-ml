@@ -89,11 +89,11 @@ fig, axs = plt.subplots(2, 4, figsize=(17, 8))
 for ax, c in zip(axs[0], ['C', 'HJ_temper', 'Ms_Andrews', 'Ni']):
     for k, g in par.groupby('cls'): ax.scatter(g[c], g.T0, s=25, label=k)
     ax.set_xlabel(nice(c)); ax.set_ylabel(TT + ' (°C)'); ax.grid(alpha=.3)
-    r, pv_ = stats.spearmanr(par[c], par.T0); ax.set_title(f'rho={r:+.2f}, p={pv_:.3f}', fontsize=9)
+    r, pv_ = stats.spearmanr(par[c], par.T0); ax.set_title((f'ρ = {r:+.2f}, ' + ('p < 0.001' if pv_ < 0.001 else f'p = {pv_:.3f}')).replace('-', '−'), fontsize=9)
 for ax, c in zip(axs[1], ['C', 'HJ_temper', 'Ms_Andrews', 'Ni']):
     for k, g in par.groupby('cls'): ax.scatter(g[c], g.USE, s=25, label=k)
     ax.set_xlabel(nice(c)); ax.set_ylabel('USE (J)'); ax.grid(alpha=.3)
-    r, pv_ = stats.spearmanr(par[c], par.USE); ax.set_title(f'rho={r:+.2f}, p={pv_:.3f}', fontsize=9)
+    r, pv_ = stats.spearmanr(par[c], par.USE); ax.set_title((f'ρ = {r:+.2f}, ' + ('p < 0.001' if pv_ < 0.001 else f'p = {pv_:.3f}')).replace('-', '−'), fontsize=9)
 h_, l_ = axs[0, 0].get_legend_handles_labels(); fig.legend(h_, l_, loc='lower center', ncol=5, fontsize=8, frameon=False, columnspacing=1.0, handletextpad=0.2)
 fig._tl_rect = (0, 0.06, 1, 1); plt.tight_layout(rect=fig._tl_rect); plt.savefig(RES / 'eda_fig_curveparams_vs_features.png', dpi=140); plt.close()
 
